@@ -15,7 +15,7 @@ type OperationController interface {
 func New(controller OperationController) *mux.Router {
 	r := mux.NewRouter()
 
-	r.HandleFunc("/", controller.HandlerOperation).Methods(http.MethodGet)
+	r.HandleFunc("/operation", controller.HandlerOperation).Methods(http.MethodPost)
 
 	return r
 }

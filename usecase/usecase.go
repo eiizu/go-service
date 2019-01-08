@@ -1,5 +1,9 @@
 package usecase
 
+import (
+	"strings"
+)
+
 // Operation -
 type Operation struct{}
 
@@ -9,6 +13,13 @@ func New() *Operation {
 }
 
 // Compute -
-func (op *Operation) Compute() (string, error) {
-	return "Everything is ok", nil
+func (op *Operation) Compute(data string) (map[string]int, error) {
+	resp := map[string]int{}
+
+	arr := strings.Split(data, " ")
+	for _, value := range arr {
+		resp[value]++
+	}
+
+	return resp, nil
 }
