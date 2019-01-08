@@ -10,6 +10,7 @@ import (
 	"go-service/router"
 	"go-service/usecase"
 
+	"github.com/codegangsta/negroni"
 	"github.com/sirupsen/logrus"
 	"github.com/unrolled/render"
 )
@@ -24,6 +25,9 @@ func main() {
 
 	r := router.New(myController)
 
+	n := negroni.Classic()
+	n.UseHandler(r)
+
 	stop := make(chan os.Signal, 1)
 	signal.Notify(
 		stop,
@@ -35,7 +39,7 @@ func main() {
 	go func() {
 		address := "localhost:7071"
 		logger.WithField("Address", address).Info("Starting server")
-		if err := http.ListenAndServe(address, r); err != nil {
+		if err := http.ListenAndServe(address, n); err != nil {
 			logger.Fatal("something went wrong")
 		}
 	}()
