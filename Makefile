@@ -1,5 +1,5 @@
 .PHONY: build
-build: ## Build
+build: dep ## Build
 	@echo "::: building app"
 	go build -o ./bin/app
 	@echo "::: build done"
@@ -8,3 +8,9 @@ build: ## Build
 run: build ## Run application 
 	@echo "::: running app"
 	./bin/app
+
+.PHONY: dep
+dep: ## Download dependecies
+	@echo "::: downloading dependencies"
+	go mod tidy
+	@echo "::: done"

@@ -6,13 +6,19 @@ import (
 	"os/signal"
 	"syscall"
 
-	"go-service/controller"
-	"go-service/router"
-	"go-service/usecase"
+	"github.com/eiizu/go-service/controller"
+	"github.com/eiizu/go-service/router"
+	"github.com/eiizu/go-service/usecase"
 
 	"github.com/codegangsta/negroni"
 	"github.com/sirupsen/logrus"
 	"github.com/unrolled/render"
+)
+
+
+const (
+	// AppName application name
+	AppName = "go-service-demo"
 )
 
 func main() {
@@ -20,14 +26,21 @@ func main() {
 	logger := logrus.New()
 	myRender := render.New()
 
-	myUseCase := usecase.New()
-	myController := controller.New(myUseCase, myRender)
+	// UseCase init
+	somethingUC := usecase.NewSomething()
+	statusUC := usecase.NewStatus(AppName)
 
-	r := router.New(myController)
+	// Controller init
+	somethingC := controller.NewSomething(somethingUC, myRender)
+	statusC := controller.NewStatus(statusUC, myRender)
+
+	// Create router
+	r := router.New(somethingC, statusC)
 
 	n := negroni.Classic()
 	n.UseHandler(r)
 
+	// Define stop signal for the end of excecution
 	stop := make(chan os.Signal, 1)
 	signal.Notify(
 		stop,

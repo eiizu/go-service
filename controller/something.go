@@ -8,14 +8,14 @@ import (
 	"github.com/unrolled/render"
 )
 
-// OperationUseCase -
-type OperationUseCase interface {
-	Compute(string) (map[string]int, error)
+// SomethingUseCase -
+type SomethingUseCase interface {
+	DoSomething(string) (map[string]int, error)
 }
 
-// Operation -
-type Operation struct {
-	UseCase OperationUseCase
+// Something -
+type Something struct {
+	UseCase SomethingUseCase
 	Render  *render.Render
 }
 
@@ -24,16 +24,16 @@ type Request struct {
 	Info string `json:"info"`
 }
 
-// New -
-func New(uc OperationUseCase, r *render.Render) *Operation {
-	return &Operation{
+// NewSomething -
+func NewSomething(uc SomethingUseCase, r *render.Render) *Something {
+	return &Something{
 		UseCase: uc,
 		Render:  r,
 	}
 }
 
-// HandlerOperation -
-func (op *Operation) HandlerOperation(w http.ResponseWriter, r *http.Request) {
+// HandlerSomething -
+func (op *Something) HandlerSomething(w http.ResponseWriter, r *http.Request) {
 	decoder := json.NewDecoder(r.Body)
 
 	var data Request
@@ -48,7 +48,7 @@ func (op *Operation) HandlerOperation(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	resp, err := op.UseCase.Compute(data.Info)
+	resp, err := op.UseCase.DoSomething(data.Info)
 	if err != nil {
 		op.Render.Text(w, http.StatusBadRequest, "something went wrong")
 		return
