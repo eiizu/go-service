@@ -26,9 +26,12 @@ func TestNewStatus(t *testing.T) {
 }
 
 func TestStatus_Statusz(t *testing.T) {
+	type fields struct {
+		AppName string
+	}
 	tests := []struct {
 		name    string
-		s       *Status
+		fields  fields
 		want    string
 		wantErr bool
 	}{
@@ -36,7 +39,10 @@ func TestStatus_Statusz(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := tt.s.Statusz()
+			s := &Status{
+				AppName: tt.fields.AppName,
+			}
+			got, err := s.Statusz()
 			if (err != nil) != tt.wantErr {
 				t.Errorf("Status.Statusz() error = %v, wantErr %v", err, tt.wantErr)
 				return
@@ -49,9 +55,12 @@ func TestStatus_Statusz(t *testing.T) {
 }
 
 func TestStatus_Healthz(t *testing.T) {
+	type fields struct {
+		AppName string
+	}
 	tests := []struct {
 		name    string
-		uc      *Status
+		fields  fields
 		want    string
 		wantErr bool
 	}{
@@ -59,7 +68,10 @@ func TestStatus_Healthz(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := tt.uc.Healthz()
+			uc := &Status{
+				AppName: tt.fields.AppName,
+			}
+			got, err := uc.Healthz()
 			if (err != nil) != tt.wantErr {
 				t.Errorf("Status.Healthz() error = %v, wantErr %v", err, tt.wantErr)
 				return

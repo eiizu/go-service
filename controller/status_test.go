@@ -1,17 +1,15 @@
 package controller
 
 import (
-	"net/http"
 	"reflect"
 	"testing"
 
-	"github.com/unrolled/render"
+	"github.com/labstack/echo"
 )
 
 func TestNewStatus(t *testing.T) {
 	type args struct {
 		uc StatusUseCase
-		r  *render.Render
 	}
 	tests := []struct {
 		name string
@@ -22,7 +20,7 @@ func TestNewStatus(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := NewStatus(tt.args.uc, tt.args.r); !reflect.DeepEqual(got, tt.want) {
+			if got := NewStatus(tt.args.uc); !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("NewStatus() = %v, want %v", got, tt.want)
 			}
 		})
@@ -30,39 +28,55 @@ func TestNewStatus(t *testing.T) {
 }
 
 func TestStatus_HandlerStatusz(t *testing.T) {
+	type fields struct {
+		UseCase StatusUseCase
+	}
 	type args struct {
-		w http.ResponseWriter
-		r *http.Request
+		eCtx echo.Context
 	}
 	tests := []struct {
-		name string
-		c    *Status
-		args args
+		name    string
+		fields  fields
+		args    args
+		wantErr bool
 	}{
 		// TODO: Add test cases.
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			tt.c.HandlerStatusz(tt.args.w, tt.args.r)
+			c := &Status{
+				UseCase: tt.fields.UseCase,
+			}
+			if err := c.HandlerStatusz(tt.args.eCtx); (err != nil) != tt.wantErr {
+				t.Errorf("Status.HandlerStatusz() error = %v, wantErr %v", err, tt.wantErr)
+			}
 		})
 	}
 }
 
 func TestStatus_HandlerHealthz(t *testing.T) {
+	type fields struct {
+		UseCase StatusUseCase
+	}
 	type args struct {
-		w http.ResponseWriter
-		r *http.Request
+		eCtx echo.Context
 	}
 	tests := []struct {
-		name string
-		c    *Status
-		args args
+		name    string
+		fields  fields
+		args    args
+		wantErr bool
 	}{
 		// TODO: Add test cases.
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			tt.c.HandlerHealthz(tt.args.w, tt.args.r)
+			c := &Status{
+				UseCase: tt.fields.UseCase,
+			}
+			if err := c.HandlerHealthz(tt.args.eCtx); (err != nil) != tt.wantErr {
+				t.Errorf("Status.HandlerHealthz() error = %v, wantErr %v", err, tt.wantErr)
+			}
 		})
 	}
 }

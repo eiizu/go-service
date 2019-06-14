@@ -1,31 +1,28 @@
 package router
 
 import (
-	"net/http"
-
-	"github.com/gorilla/mux"
+	"github.com/labstack/echo"
 )
-
 
 // StatusController -
 type StatusController interface {
-	HandlerStatusz(w http.ResponseWriter, r *http.Request)
-	HandlerHealthz(w http.ResponseWriter, r *http.Request)
+	HandlerStatusz(c echo.Context) error
+	HandlerHealthz(c echo.Context) error
 }
 
 // SomethingController -
 type SomethingController interface {
-	HandlerSomething(w http.ResponseWriter, r *http.Request)
+	HandlerSomething(c echo.Context) error
 }
 
 // New -
-func New(somethingC SomethingController, statusC StatusController) *mux.Router {
-	r := mux.NewRouter()
+func New(somethingC SomethingController, statusC StatusController) *echo.Echo {
+	e := echo.New()
 
-	r.HandleFunc("/statusz", statusC.HandlerStatusz).Methods(http.MethodGet)
-	r.HandleFunc("/healthz", statusC.HandlerHealthz).Methods(http.MethodGet)
+	e.GET("/statusz", statusC.HandlerStatusz)
+	e.GET("/healthz", statusC.HandlerHealthz)
 
-	r.HandleFunc("/operation", somethingC.HandlerSomething).Methods(http.MethodPost)
+	e.POST("/operation", somethingC.HandlerSomething)
 
-	return r
+	return e
 }

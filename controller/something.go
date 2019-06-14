@@ -4,9 +4,10 @@ import (
 	"encoding/json"
 	"net/http"
 
-	"github.com/sirupsen/logrus"
-	"github.com/unrolled/render"
+	"github.com/labstack/echo"
 )
+
+//go:generate mockgen -destination=./mocks/mock_something.go -package=mocks github.com/eiizu/go-service/controller SomethingUseCase
 
 // SomethingUseCase -
 type SomethingUseCase interface {
@@ -16,7 +17,6 @@ type SomethingUseCase interface {
 // Something -
 type Something struct {
 	UseCase SomethingUseCase
-	Render  *render.Render
 }
 
 // Request -
@@ -25,34 +25,29 @@ type Request struct {
 }
 
 // NewSomething -
-func NewSomething(uc SomethingUseCase, r *render.Render) *Something {
+func NewSomething(uc SomethingUseCase) *Something {
 	return &Something{
 		UseCase: uc,
-		Render:  r,
 	}
 }
 
 // HandlerSomething -
-func (op *Something) HandlerSomething(w http.ResponseWriter, r *http.Request) {
-	decoder := json.NewDecoder(r.Body)
+func (c *Something) HandlerSomething(eCtx echo.Context) error {
+	decoder := json.NewDecoder(eCtx.Request().Body)
 
 	var data Request
 	if err := decoder.Decode(&data); err != nil {
-		logrus.WithError(err).Info("decoding")
-		op.Render.Text(w, http.StatusBadRequest, "invalid json")
-		return
+		return eCtx.String(http.StatusBadRequest, "invalid json")
 	}
 
 	if data.Info == "" {
-		op.Render.Text(w, http.StatusBadRequest, "invalid info")
-		return
+		return eCtx.String(http.StatusBadRequest, "invalid info")
 	}
 
-	resp, err := op.UseCase.DoSomething(data.Info)
+	resp, err := c.UseCase.DoSomething(data.Info)
 	if err != nil {
-		op.Render.Text(w, http.StatusBadRequest, "something went wrong")
-		return
+		return eCtx.String(http.StatusBadRequest, "something went wrong")
 	}
 
-	op.Render.JSON(w, http.StatusOK, resp)
+	return eCtx.JSON(http.StatusOK, resp)
 }

@@ -1,20 +1,17 @@
 package main
 
 import (
-	"net/http"
 	"os"
 	"os/signal"
 	"syscall"
 
 	"github.com/eiizu/go-service/controller"
 	"github.com/eiizu/go-service/router"
+	"github.com/eiizu/go-service/service"
 	"github.com/eiizu/go-service/usecase"
 
-	"github.com/codegangsta/negroni"
 	"github.com/sirupsen/logrus"
-	"github.com/unrolled/render"
 )
-
 
 const (
 	// AppName application name
@@ -24,21 +21,20 @@ const (
 func main() {
 
 	logger := logrus.New()
-	myRender := render.New()
+
+	// Service init
+	someService := service.NewSomeService("something")
 
 	// UseCase init
-	somethingUC := usecase.NewSomething()
+	somethingUC := usecase.NewSomething(someService)
 	statusUC := usecase.NewStatus(AppName)
 
 	// Controller init
-	somethingC := controller.NewSomething(somethingUC, myRender)
-	statusC := controller.NewStatus(statusUC, myRender)
+	somethingC := controller.NewSomething(somethingUC)
+	statusC := controller.NewStatus(statusUC)
 
 	// Create router
 	r := router.New(somethingC, statusC)
-
-	n := negroni.Classic()
-	n.UseHandler(r)
 
 	// Define stop signal for the end of excecution
 	stop := make(chan os.Signal, 1)
@@ -50,14 +46,13 @@ func main() {
 	)
 
 	go func() {
-		address := "localhost:7071"
-		logger.WithField("Address", address).Info("Starting server")
-		if err := http.ListenAndServe(address, n); err != nil {
+		address := ":8080"
+		if err := r.Start(address); err != nil {
 			logger.Fatal("something went wrong")
 		}
 	}()
 
 	<-stop
 
-	logger.Info("Shutting down server...")
+	logger.Info("shutting down server...")
 }

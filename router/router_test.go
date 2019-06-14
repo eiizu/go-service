@@ -4,7 +4,7 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/gorilla/mux"
+	"github.com/labstack/echo"
 )
 
 func TestNew(t *testing.T) {
@@ -15,7 +15,7 @@ func TestNew(t *testing.T) {
 	tests := []struct {
 		name string
 		args args
-		want *mux.Router
+		want *echo.Echo
 	}{
 		// TODO: Add test cases.
 	}

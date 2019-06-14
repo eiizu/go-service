@@ -3,9 +3,10 @@ package controller
 import (
 	"net/http"
 
-	"github.com/sirupsen/logrus"
-	"github.com/unrolled/render"
+	"github.com/labstack/echo"
 )
+
+//go:generate mockgen -destination=./mocks/mock_status.go -package=mocks github.com/eiizu/go-service/controller StatusUseCase
 
 // StatusUseCase -
 type StatusUseCase interface {
@@ -16,37 +17,31 @@ type StatusUseCase interface {
 // Status -
 type Status struct {
 	UseCase StatusUseCase
-	Render  *render.Render
 }
 
 // NewStatus -
-func NewStatus(uc StatusUseCase, r *render.Render) *Status {
+func NewStatus(uc StatusUseCase) *Status {
 	return &Status{
 		UseCase: uc,
-		Render:  r,
 	}
 }
 
 // HandlerStatusz -
-func (c *Status) HandlerStatusz(w http.ResponseWriter, r *http.Request) {
+func (c *Status) HandlerStatusz(eCtx echo.Context) error {
 	resp, err := c.UseCase.Statusz()
 	if err != nil {
-		logrus.WithError(err).Info("statusz")
-		c.Render.Text(w, http.StatusBadRequest, "something went wrong")
-		return
+		return eCtx.String(http.StatusBadRequest, "something went wrong")
 	}
 
-	c.Render.JSON(w, http.StatusOK, resp)
+	return eCtx.JSON(http.StatusOK, resp)
 }
 
 // HandlerHealthz -
-func (c *Status) HandlerHealthz(w http.ResponseWriter, r *http.Request) {
+func (c *Status) HandlerHealthz(eCtx echo.Context) error {
 	resp, err := c.UseCase.Healthz()
 	if err != nil {
-		logrus.WithError(err).Info("healthz")
-		c.Render.Text(w, http.StatusBadRequest, "something went wrong")
-		return
+		return eCtx.String(http.StatusBadRequest, "something went wrong")
 	}
 
-	c.Render.JSON(w, http.StatusOK, resp)
+	return eCtx.JSON(http.StatusOK, resp)
 }

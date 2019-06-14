@@ -4,19 +4,29 @@ import (
 	"strings"
 )
 
+type SomeService interface {
+	GetParam() string
+}
+
 // Something -
-type Something struct{}
+type Something struct {
+	SomeService SomeService
+}
 
 // NewSomething -
-func NewSomething() *Something {
-	return &Something{}
+func NewSomething(s SomeService) *Something {
+	return &Something{
+		SomeService: s,
+	}
 }
 
 // DoSomething -
-func (op *Something) DoSomething(data string) (map[string]int, error) {
+func (uc *Something) DoSomething(data string) (map[string]int, error) {
 	resp := map[string]int{}
 
-	arr := strings.Split(data, " ")
+	str := data + uc.SomeService.GetParam()
+	arr := strings.Split(str, " ")
+
 	for _, value := range arr {
 		resp[value]++
 	}
