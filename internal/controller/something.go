@@ -7,7 +7,7 @@ import (
 	"github.com/labstack/echo"
 )
 
-//go:generate mockgen -destination=./mocks/mock_something.go -package=mocks github.com/eiizu/go-service/controller SomethingUseCase
+//go:generate mockgen --build_flags=--mod=mod -destination=./mocks/mock_something.go -package=mocks github.com/eiizu/go-service/internal/controller SomethingUseCase
 
 // SomethingUseCase -
 type SomethingUseCase interface {

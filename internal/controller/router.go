@@ -1,4 +1,4 @@
-package router
+package controller
 
 import (
 	"github.com/labstack/echo"
@@ -16,7 +16,7 @@ type SomethingController interface {
 }
 
 // New -
-func New(somethingC SomethingController, statusC StatusController) *echo.Echo {
+func NewRouter(somethingC SomethingController, statusC StatusController) *echo.Echo {
 	e := echo.New()
 
 	e.GET("/statusz", statusC.HandlerStatusz)

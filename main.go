@@ -5,12 +5,13 @@ import (
 	"os/signal"
 	"syscall"
 
-	"github.com/eiizu/go-service/controller"
-	"github.com/eiizu/go-service/router"
-	"github.com/eiizu/go-service/service"
-	"github.com/eiizu/go-service/usecase"
+	"github.com/eiizu/go-service/internal/controller"
+	"github.com/eiizu/go-service/internal/service"
+	"github.com/eiizu/go-service/internal/usecase"
 
 	"github.com/sirupsen/logrus"
+
+	_ "github.com/golang/mock/mockgen/model"
 )
 
 const (
@@ -19,22 +20,27 @@ const (
 )
 
 func main() {
-
 	logger := logrus.New()
 
-	// Service init
+	// Services init
+	// Service layer involves all the dependencies that the service
+	// needs to perform its operations
 	someService := service.NewSomeService("something")
 
 	// UseCase init
+	// UseCase layer involves all the business logic of the application,
+	// the usecase are split by responsabilities. Eg something, status
 	somethingUC := usecase.NewSomething(someService)
 	statusUC := usecase.NewStatus(AppName)
 
 	// Controller init
+	// Controller layer involves all the http stuff...
 	somethingC := controller.NewSomething(somethingUC)
 	statusC := controller.NewStatus(statusUC)
 
 	// Create router
-	r := router.New(somethingC, statusC)
+	// The router expects multiple controllers with its specific handlers
+	r := controller.NewRouter(somethingC, statusC)
 
 	// Define stop signal for the end of excecution
 	stop := make(chan os.Signal, 1)
